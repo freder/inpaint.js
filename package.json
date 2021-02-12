@@ -1,0 +1,5 @@
+{
+  "name": "inpaint-wasm",
+  "version": "0.0.0",
+  "description": "webassembly port of inpaint.js"
+}
