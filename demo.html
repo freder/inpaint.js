@@ -6,24 +6,11 @@
 		<title></title>
 	</head>
 	<body>
-		<script type="text/javascript" src="inpaint.js"></script>
 		<script type="text/javascript" src="heapqueue.js"></script>
+		<script type="text/javascript" src="inpaint.js"></script>
 		<script type="text/javascript" src="demo.js"></script>
 		<script>
-			const logError = (_msg, _file, line, column) => {
-				console.error(`Error at ${line}:${column}`);
-			};
-
-			WebAssembly
-				.instantiateStreaming(
-					fetch('/build/untouched.wasm'),
-					{
-						env: {
-							abort: logError
-						}
-					}
-				)
-				.then(({ instance }) => main(instance));
+			main();
 		</script>
 	</body>
 </html>

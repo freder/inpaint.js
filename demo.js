@@ -1,3 +1,5 @@
+/* global InpaintTelea */
+
 function createImgCanvas(img) {
 	const canvas = document.createElement('canvas');
 	const { width, height } = img;
@@ -10,12 +12,37 @@ function createImgCanvas(img) {
 }
 
 
-function main(instance) {
-	const { add } = instance.exports;
-	console.log(add(1, 666));
+const logError = (_msg, _file, line, column) => {
+	console.error(`Error at ${line}:${column}`);
+};
 
+
+// eslint-disable-next-line no-unused-vars
+function main() {
 	const img = new Image();
 	img.onload = () => {
+		const { width, height } = img;
+
+		// https://blog.ttulka.com/learning-webassembly-10-image-processing-in-assemblyscript
+		const arraySize = (width * height * 4) >>> 0;
+		const nPages = ((arraySize + 0xffff) & ~0xffff) >>> 16;
+		const memory = new WebAssembly.Memory({ initial: nPages });
+
+		WebAssembly
+			.instantiateStreaming(
+				fetch('/build/untouched.wasm'),
+				{
+					env: {
+						memory,
+						abort: logError
+					}
+				}
+			)
+			.then(({ instance }) => {
+				const { add } = instance.exports;
+				console.log(add(1, 666));
+			});
+
 		document.body.appendChild(img);
 		const { ctx, canvas } = createImgCanvas(img);
 		demo({ ctx, canvas });
