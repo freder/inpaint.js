@@ -1,5 +1,16 @@
 {
   "name": "inpaint-wasm",
   "version": "0.0.0",
-  "description": "webassembly port of inpaint.js"
+  "description": "webassembly port of inpaint.js",
+  "dependencies": {
+    "@assemblyscript/loader": "^0.18.7"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.18.7"
+  },
+  "scripts": {
+    "asbuild:untouched": "asc src/index.ts --target debug",
+    "asbuild:optimized": "asc src/index.ts --target release",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  }
 }
