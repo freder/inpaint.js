@@ -11,9 +11,9 @@
   Using it is pretty simple, you just create an instance of HeapQueue
   while optionally specifying a comparator as the argument:
 
-  var heapq = new HeapQueue()
+  const heapq = new HeapQueue()
 
-  var customq = new HeapQueue(function(a, b){
+  const customq = new HeapQueue(function(a, b){
   	// if b > a, return negative
   	// means that it spits out the smallest item first
 	return a - b
@@ -53,6 +53,7 @@
   heapq.pop() ==> 3
 
 */
+
 function HeapQueue(cmp) {
 	this.cmp =
 		cmp ||
@@ -62,14 +63,16 @@ function HeapQueue(cmp) {
 	this.length = 0;
 	this.data = [];
 }
+
 HeapQueue.prototype.peek = function () {
 	return this.data[0];
 };
+
 HeapQueue.prototype.push = function (value) {
 	this.data.push(value);
-	var pos = this.data.length - 1,
-		parent,
-		x;
+	let pos = this.data.length - 1;
+	let parent;
+	let x;
 	while (pos > 0) {
 		parent = (pos - 1) >>> 1;
 		if (this.cmp(this.data[pos], this.data[parent]) < 0) {
@@ -82,17 +85,18 @@ HeapQueue.prototype.push = function (value) {
 	return ++this.length;
 };
 HeapQueue.prototype.pop = function () {
-	var ret = this.data[0],
-		last_val = this.data.pop();
+	const ret = this.data[0];
+	const last_val = this.data.pop();
 	this.length--;
 	if (this.data.length > 0) {
 		this.data[0] = last_val;
-		var pos = 0,
-			last = this.data.length - 1,
-			left,
-			right,
-			minIndex,
-			x;
+		let pos = 0;
+		const last = this.data.length - 1;
+		let left;
+		let right;
+		let minIndex;
+		let x;
+		// eslint-disable-next-line no-constant-condition
 		while (1) {
 			left = (pos << 1) + 1;
 			right = left + 1;
@@ -100,19 +104,23 @@ HeapQueue.prototype.pop = function () {
 			if (
 				left <= last &&
 				this.cmp(this.data[left], this.data[minIndex]) < 0
-			)
+			) {
 				minIndex = left;
+			}
 			if (
 				right <= last &&
 				this.cmp(this.data[right], this.data[minIndex]) < 0
-			)
+			) {
 				minIndex = right;
+			}
 			if (minIndex !== pos) {
 				x = this.data[minIndex];
 				this.data[minIndex] = this.data[pos];
 				this.data[pos] = x;
 				pos = minIndex;
-			} else break;
+			} else {
+				break;
+			}
 		}
 	}
 	return ret;

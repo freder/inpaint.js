@@ -6,14 +6,14 @@
 function InpaintTelea(width, height, image, mask, radius) {
 	if (!radius) radius = 5;
 
-	var LARGE_VALUE = 1e6;
-	var SMALL_VALUE = 1e-6;
+	const LARGE_VALUE = 1e6;
+	const SMALL_VALUE = 1e-6;
 
-	var size = width * height;
-	var flag = new Uint8Array(size);
-	var u = new Float32Array(size);
+	const size = width * height;
+	const flag = new Uint8Array(size);
+	const u = new Float32Array(size);
 
-	for (var i = 0; i < size; i++) {
+	for (let i = 0; i < size; i++) {
 		if (!mask[i]) continue;
 		// this is the equivalent of doing a morphological dilation with
 		// a 1-pixel cross structuring element for first pass through flag
@@ -22,57 +22,38 @@ function InpaintTelea(width, height, image, mask, radius) {
 		] = 1;
 	}
 
-	for (var i = 0; i < size; i++) {
+	for (let i = 0; i < size; i++) {
 		flag[i] = flag[i] * 2 - (mask[i] ^ flag[i]);
 		if (flag[i] == 2)
 			// UNKNOWN
 			u[i] = LARGE_VALUE;
 	}
 
-	var heap = new HeapQueue(function (a, b) {
+	const heap = new HeapQueue(function (a, b) {
 		return a[0] - b[0];
 	}); // sort by first thingy
 
-	for (var i = 0; i < size; i++) {
+	for (let i = 0; i < size; i++) {
 		if (flag[i] == 1)
 			// BAND
 			heap.push([u[i], i]);
 	}
 
-	var indices_centered = [];
+	const indices_centered = [];
 	// generate a mask for a circular structuring element
-	for (var i = -radius; i <= radius; i++) {
-		var h = Math.floor(Math.sqrt(radius * radius - i * i));
-		for (var j = -h; j <= h; j++) indices_centered.push(i + j * width);
+	for (let i = -radius; i <= radius; i++) {
+		const h = Math.floor(Math.sqrt(radius * radius - i * i));
+		for (let j = -h; j <= h; j++) indices_centered.push(i + j * width);
 	}
 
-	// function eikonal(n1, n2){
-	// 	var u1 = u[n1],
-	// 		u2 = u[n2];
-	// 	if(flag[n1] == 0 /*KNOWN*/){
-	// 		if(flag[n2] == 0 /*KNOWN*/){
-	// 			var perp = Math.sqrt(2 - Math.pow(u1 - u2, 2)); // perpendicular distance
-	// 			var s = (u1 + u2 - perp) * 0.5; // average distance
-	// 			if(s >= u1 && s >= u2) return s;
-	// 			s += perp;
-	// 			if(s >= u1 && s >= u2) return s;
-	// 		}else{
-	// 			return 1 + u1
-	// 		}
-	// 	}else if(flag[n2] == 0 /*KNOWN*/){
-	// 		return 1 + u2;
-	// 	}
-	// 	return LARGE_VALUE
-	// }
-
 	function eikonal(n1, n2) {
-		var u_out = LARGE_VALUE,
-			u1 = u[n1],
-			u2 = u[n2];
+		let u_out = LARGE_VALUE;
+		let u1 = u[n1];
+		let u2 = u[n2];
 		if (flag[n1] == 0) {
 			if (flag[n2] == 0) {
-				var perp = Math.sqrt(2 - (u1 - u2) * (u1 - u2));
-				var s = (u1 + u2 - perp) * 0.5;
+				const perp = Math.sqrt(2 - (u1 - u2) * (u1 - u2));
+				let s = (u1 + u2 - perp) * 0.5;
 				if (s >= u1 && s >= u2) {
 					u_out = s;
 				} else {
@@ -89,19 +70,20 @@ function InpaintTelea(width, height, image, mask, radius) {
 		}
 		return u_out;
 	}
+
 	function inpaint_point(n) {
-		var Ia = 0,
-			norm = 0;
-		// var Jx = 0, Jy = 0;
-		var gradx_u = grad_func(u, n, 1),
+		let Ia = 0;
+		let norm = 0;
+		// const Jx = 0, Jy = 0;
+		const gradx_u = grad_func(u, n, 1),
 			grady_u = grad_func(u, n, width);
 
-		var i = n % width,
+		const i = n % width,
 			j = Math.floor(n / width);
 
-		for (var k = 0; k < indices_centered.length; k++) {
-			var nb = n + indices_centered[k];
-			var i_nb = nb % width,
+		for (let k = 0; k < indices_centered.length; k++) {
+			const nb = n + indices_centered[k];
+			const i_nb = nb % width,
 				j_nb = Math.floor(nb / width);
 
 			if (
@@ -114,15 +96,15 @@ function InpaintTelea(width, height, image, mask, radius) {
 
 			if (flag[nb] != 0 /*KNOWN*/) continue;
 
-			var rx = i - i_nb,
+			const rx = i - i_nb,
 				ry = j - j_nb;
 
-			var geometric_dst =
+			const geometric_dst =
 				1 / ((rx * rx + ry * ry) * Math.sqrt(rx * rx + ry * ry));
-			var levelset_dst = 1 / (1 + Math.abs(u[nb] - u[n]));
-			var direction = Math.abs(rx * gradx_u + ry * grady_u);
-			var weight = geometric_dst * levelset_dst * direction + SMALL_VALUE;
-			// var gradx_img = grad_func(image, nb, 1) + SMALL_VALUE,
+			const levelset_dst = 1 / (1 + Math.abs(u[nb] - u[n]));
+			const direction = Math.abs(rx * gradx_u + ry * grady_u);
+			const weight = geometric_dst * levelset_dst * direction + SMALL_VALUE;
+			// const gradx_img = grad_func(image, nb, 1) + SMALL_VALUE,
 			// 	grady_img = grad_func(image, nb, width) + SMALL_VALUE;
 
 			Ia += weight * image[nb];
@@ -159,13 +141,13 @@ function InpaintTelea(width, height, image, mask, radius) {
 	}
 
 	while (heap.length) {
-		var n = heap.pop()[1];
-		var i = n % width,
+		const n = heap.pop()[1];
+		const i = n % width,
 			j = Math.floor(n / width);
 		flag[n] = 0; // KNOWN
 		if (i <= 1 || j <= 1 || i >= width - 1 || j >= height - 1) continue;
-		for (var k = 0; k < 4; k++) {
-			var nb = n + [-width, -1, width, 1][k];
+		for (let k = 0; k < 4; k++) {
+			const nb = n + [-width, -1, width, 1][k];
 			if (flag[nb] != 0) {
 				// not KNOWN
 				u[nb] = Math.min(
