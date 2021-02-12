@@ -64,9 +64,11 @@ function HeapQueue(cmp) {
 	this.data = [];
 }
 
+
 HeapQueue.prototype.peek = function () {
 	return this.data[0];
 };
+
 
 HeapQueue.prototype.push = function (value) {
 	this.data.push(value);
@@ -80,10 +82,14 @@ HeapQueue.prototype.push = function (value) {
 			this.data[parent] = this.data[pos];
 			this.data[pos] = x;
 			pos = parent;
-		} else break;
+		} else {
+			break;
+		}
 	}
 	return ++this.length;
 };
+
+
 HeapQueue.prototype.pop = function () {
 	const ret = this.data[0];
 	const last_val = this.data.pop();
