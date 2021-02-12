@@ -3,7 +3,7 @@
 // implementation which can be found in
 // https://github.com/chintak/scikit-image/blob/inpaint/skimage/filter/_inpaint_fmm.pyx
 
-const HeapQueue = require('./heapqueue.js');
+// import HeapQueue from './heapqueue';
 
 
 const LARGE_VALUE = 1e6;
@@ -110,7 +110,7 @@ function inpaint_point(n, flag, u, image, width, height, indices_centered) {
 }
 
 
-function InpaintTelea(width, height, image, mask, radius) {
+/*export default*/ function InpaintTelea(width, height, image, mask, radius) {
 	if (!radius) {
 		radius = 5;
 	}
