@@ -23,10 +23,12 @@ function main() {
 	img.onload = () => {
 		const { width, height } = img;
 
-		// https://blog.ttulka.com/learning-webassembly-10-image-processing-in-assemblyscript
-		const arraySize = (width * height * 4) >>> 0;
-		const nPages = ((arraySize + 0xffff) & ~0xffff) >>> 16;
-		const memory = new WebAssembly.Memory({ initial: nPages });
+		const arraySize = width * height * 4;
+		// we need space for the image and the mask
+		const numPages = 2 * arraySize / (64 * 1000); // 64kb per page
+		const memory = new WebAssembly.Memory({
+			initial: numPages
+		});
 
 		WebAssembly
 			.instantiateStreaming(
@@ -41,6 +43,21 @@ function main() {
 			.then(({ instance }) => {
 				const { add } = instance.exports;
 				console.log(add(1, 666));
+
+				// load bytes into memory
+				const bytes = new Uint8ClampedArray(memory.buffer);
+
+				// for (let i = 0; i < data.length; i++)
+				// 	bytes[i] = data[i];
+
+				// instance.exports.convertToGrayscale(width, height, 80);
+
+				// // load data from memory
+				// for (let i = 0; i < bytes.length; i++) {
+				// 	data[i] = bytes[i];
+				// }
+
+				// ctx.putImageData(imageData, 0, 0);
 			});
 
 		document.body.appendChild(img);

@@ -9,8 +9,8 @@
     "assemblyscript": "^0.18.7"
   },
   "scripts": {
-    "asbuild:untouched": "asc src/index.ts --target debug",
-    "asbuild:optimized": "asc src/index.ts --target release",
+    "asbuild:untouched": "asc src/index.ts --importMemory --target debug",
+    "asbuild:optimized": "asc src/index.ts --importMemory --target release",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   }
 }
