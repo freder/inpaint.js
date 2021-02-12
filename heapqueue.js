@@ -51,7 +51,6 @@
   heapq.pop() ==> 1
   heapq.pop() ==> 2
   heapq.pop() ==> 3
-
 */
 
 /*export default*/ function HeapQueue(cmp) {
