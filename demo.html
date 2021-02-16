@@ -31,6 +31,9 @@ function blah(merp){
 			// blah.data[i * 4 + 2] = 0
 		}
 	}
+
+	const start = Date.now();
+
 	for(var channel = 0; channel < 3; channel++){
 		var img_u8 = new Uint8Array(width * height)
 		for(var n = 0; n < blah.data.length; n+=4){
@@ -39,15 +42,17 @@ function blah(merp){
 		InpaintTelea(width, height, img_u8, mask_u8)
 		for(var i = 0; i < img_u8.length; i++){
 			blah.data[4 * i + channel] = img_u8[i]
-		}	
+		}
 	}
 
-	
+	const dur = (Date.now() - start) / 1000;
+	console.log(`${dur} seconds`);
+
 	// render result back to canvas
 	for(var i = 0; i < img_u8.length; i++){
 		blah.data[4 * i + 3] = 255;
 	}
-    
+
     ctx.putImageData(blah, 0, 0);
 
 }
