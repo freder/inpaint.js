@@ -154,11 +154,7 @@ function inpaintChannel(
 		flag[i] = flag[i] * 2 - (maskVal ^ unchecked(flag[i]));
 		if (flag[i] == 2) { // UNKNOWN
 			u[i] = LARGE_VALUE;
-		}
-	}
-
-	for (let i = 0; i < size; i++) {
-		if (flag[i] == 1) { // BAND
+		} else if (flag[i] == 1) { // BAND
 			heap.push(unchecked(u[i]), i);
 		}
 	}
@@ -175,6 +171,7 @@ function inpaintChannel(
 		}
 	}
 
+	const a = [-width, -1, width, 1];
 	while (heap.length) {
 		const n = heap.pop();
 		const i = n % width;
@@ -184,7 +181,7 @@ function inpaintChannel(
 			continue;
 		}
 		for (let k = 0; k < 4; k++) {
-			const nb = n + [-width, -1, width, 1][k];
+			const nb = n + unchecked(a[k]);
 			if (flag[nb] != 0) { // not KNOWN
 				u[nb] = min([
 					eikonal(nb - width, nb - 1, flag, u),

@@ -4082,6 +4082,56 @@
   i32.add
   call $src/HeapQueue/HeapQueue#set:length
  )
+ (func $~lib/rt/__newBuffer (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+  (local $3 i32)
+  local.get $0
+  local.get $1
+  call $~lib/rt/tcms/__new
+  local.set $3
+  local.get $2
+  if
+   local.get $3
+   local.get $2
+   local.get $0
+   call $~lib/memory/memory.copy
+  end
+  local.get $3
+ )
+ (func $~lib/rt/__newArray (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  local.get $0
+  local.get $1
+  i32.shl
+  local.set $4
+  local.get $4
+  i32.const 0
+  local.get $3
+  call $~lib/rt/__newBuffer
+  local.set $5
+  i32.const 16
+  local.get $2
+  call $~lib/rt/tcms/__new
+  local.set $6
+  local.get $6
+  local.get $5
+  i32.store
+  local.get $6
+  local.get $5
+  i32.const 0
+  call $~lib/rt/tcms/__link
+  local.get $6
+  local.get $5
+  i32.store offset=4
+  local.get $6
+  local.get $4
+  i32.store offset=8
+  local.get $6
+  local.get $0
+  i32.store offset=12
+  local.get $6
+ )
  (func $~lib/array/Array<i32>#__get (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $1
@@ -4318,56 +4368,6 @@
    end
   end
   local.get $1
- )
- (func $~lib/rt/__newBuffer (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
-  (local $3 i32)
-  local.get $0
-  local.get $1
-  call $~lib/rt/tcms/__new
-  local.set $3
-  local.get $2
-  if
-   local.get $3
-   local.get $2
-   local.get $0
-   call $~lib/memory/memory.copy
-  end
-  local.get $3
- )
- (func $~lib/rt/__newArray (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  local.get $0
-  local.get $1
-  i32.shl
-  local.set $4
-  local.get $4
-  i32.const 0
-  local.get $3
-  call $~lib/rt/__newBuffer
-  local.set $5
-  i32.const 16
-  local.get $2
-  call $~lib/rt/tcms/__new
-  local.set $6
-  local.get $6
-  local.get $5
-  i32.store
-  local.get $6
-  local.get $5
-  i32.const 0
-  call $~lib/rt/tcms/__link
-  local.get $6
-  local.get $5
-  i32.store offset=4
-  local.get $6
-  local.get $4
-  i32.store offset=8
-  local.get $6
-  local.get $0
-  i32.store offset=12
-  local.get $6
  )
  (func $src/index/eikonal (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result f32)
   (local $4 f32)
@@ -4822,6 +4822,7 @@
   (local $15 i32)
   (local $16 i32)
   (local $17 i32)
+  (local $18 i32)
   local.get $0
   local.get $1
   i32.mul
@@ -4918,41 +4919,26 @@
      local.get $8
      global.get $src/index/LARGE_VALUE
      call $~lib/typedarray/Float32Array#__set
+    else
+     local.get $4
+     local.get $8
+     call $~lib/typedarray/Int32Array#__get
+     i32.const 1
+     i32.eq
+     if
+      local.get $6
+      local.get $5
+      local.get $8
+      call $~lib/typedarray/Float32Array#__uget
+      local.get $8
+      call $src/HeapQueue/HeapQueue#push
+     end
     end
     local.get $8
     i32.const 1
     i32.add
     local.set $8
     br $for-loop|1
-   end
-  end
-  i32.const 0
-  local.set $8
-  loop $for-loop|2
-   local.get $8
-   local.get $7
-   i32.lt_s
-   local.set $9
-   local.get $9
-   if
-    local.get $4
-    local.get $8
-    call $~lib/typedarray/Int32Array#__get
-    i32.const 1
-    i32.eq
-    if
-     local.get $6
-     local.get $5
-     local.get $8
-     call $~lib/typedarray/Float32Array#__uget
-     local.get $8
-     call $src/HeapQueue/HeapQueue#push
-    end
-    local.get $8
-    i32.const 1
-    i32.add
-    local.set $8
-    br $for-loop|2
    end
   end
   i32.const 0
@@ -4963,7 +4949,7 @@
   global.get $src/index/radius
   i32.sub
   local.set $9
-  loop $for-loop|3
+  loop $for-loop|2
    local.get $9
    global.get $src/index/radius
    i32.le_s
@@ -4988,7 +4974,7 @@
     local.get $12
     i32.sub
     local.set $13
-    loop $for-loop|4
+    loop $for-loop|3
      local.get $13
      local.get $12
      i32.le_s
@@ -5007,17 +4993,46 @@
       i32.const 1
       i32.add
       local.set $13
-      br $for-loop|4
+      br $for-loop|3
      end
     end
     local.get $9
     i32.const 1
     i32.add
     local.set $9
-    br $for-loop|3
+    br $for-loop|2
    end
   end
-  loop $while-continue|5
+  i32.const 4
+  i32.const 2
+  i32.const 7
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $9
+  local.get $9
+  i32.load offset=4
+  local.set $10
+  local.get $9
+  i32.const 0
+  i32.const 0
+  local.get $0
+  i32.sub
+  call $~lib/array/Array<i32>#__uset
+  local.get $9
+  i32.const 1
+  i32.const -1
+  call $~lib/array/Array<i32>#__uset
+  local.get $9
+  i32.const 2
+  local.get $0
+  call $~lib/array/Array<i32>#__uset
+  local.get $9
+  i32.const 3
+  i32.const 1
+  call $~lib/array/Array<i32>#__uset
+  local.get $9
+  local.set $10
+  loop $while-continue|4
    local.get $6
    i32.load
    local.set $9
@@ -5025,12 +5040,12 @@
    if
     local.get $6
     call $src/HeapQueue/HeapQueue#pop
-    local.set $10
-    local.get $10
+    local.set $12
+    local.get $12
     local.get $0
     i32.rem_s
-    local.set $12
-    local.get $10
+    local.set $13
+    local.get $12
     local.get $0
     i32.div_s
     f64.convert_i32_s
@@ -5039,10 +5054,10 @@
     f64.floor
     local.set $11
     local.get $4
-    local.get $10
+    local.get $12
     i32.const 0
     call $~lib/typedarray/Int32Array#__set
-    local.get $12
+    local.get $13
     i32.const 1
     i32.le_s
     if (result i32)
@@ -5055,7 +5070,7 @@
     if (result i32)
      i32.const 1
     else
-     local.get $12
+     local.get $13
      local.get $0
      i32.const 1
      i32.sub
@@ -5072,48 +5087,21 @@
      f64.ge
     end
     if
-     br $while-continue|5
+     br $while-continue|4
     end
     i32.const 0
-    local.set $13
-    loop $for-loop|6
-     local.get $13
+    local.set $14
+    loop $for-loop|5
+     local.get $14
      i32.const 4
      i32.lt_s
-     local.set $14
-     local.get $14
+     local.set $15
+     local.get $15
      if
+      local.get $12
       local.get $10
-      i32.const 4
-      i32.const 2
-      i32.const 7
-      i32.const 0
-      call $~lib/rt/__newArray
-      local.set $15
-      local.get $15
-      i32.load offset=4
-      local.set $16
-      local.get $15
-      i32.const 0
-      i32.const 0
-      local.get $0
-      i32.sub
-      call $~lib/array/Array<i32>#__uset
-      local.get $15
-      i32.const 1
-      i32.const -1
-      call $~lib/array/Array<i32>#__uset
-      local.get $15
-      i32.const 2
-      local.get $0
-      call $~lib/array/Array<i32>#__uset
-      local.get $15
-      i32.const 3
-      i32.const 1
-      call $~lib/array/Array<i32>#__uset
-      local.get $15
-      local.get $13
-      call $~lib/array/Array<i32>#__get
+      local.get $14
+      call $~lib/array/Array<i32>#__uget
       i32.add
       local.set $16
       local.get $4
@@ -5129,11 +5117,11 @@
        i32.const 6
        i32.const 0
        call $~lib/rt/__newArray
-       local.set $15
-       local.get $15
-       i32.load offset=4
        local.set $17
-       local.get $15
+       local.get $17
+       i32.load offset=4
+       local.set $18
+       local.get $17
        i32.const 0
        local.get $16
        local.get $0
@@ -5145,7 +5133,7 @@
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $15
+       local.get $17
        i32.const 1
        local.get $16
        local.get $0
@@ -5157,7 +5145,7 @@
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $15
+       local.get $17
        i32.const 2
        local.get $16
        local.get $0
@@ -5169,7 +5157,7 @@
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $15
+       local.get $17
        i32.const 3
        local.get $16
        local.get $0
@@ -5181,7 +5169,7 @@
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $15
+       local.get $17
        call $src/index/min<f32>
        call $~lib/typedarray/Float32Array#__set
        local.get $4
@@ -5210,14 +5198,14 @@
         call $src/index/inpaint_point
        end
       end
-      local.get $13
+      local.get $14
       i32.const 1
       i32.add
-      local.set $13
-      br $for-loop|6
+      local.set $14
+      br $for-loop|5
      end
     end
-    br $while-continue|5
+    br $while-continue|4
    end
   end
  )

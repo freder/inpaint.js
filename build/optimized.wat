@@ -1,7 +1,7 @@
 (module
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
  (type $none_=>_none (func))
@@ -2142,26 +2142,28 @@
   i32.add
   i32.store
  )
- (func $~lib/array/Array<i32>#__get (param $0 i32) (param $1 i32) (result i32)
-  local.get $1
+ (func $~lib/rt/__newArray (param $0 i32) (result i32)
+  (local $1 i32)
+  i32.const 16
+  i32.const 0
+  call $~lib/rt/tcms/__new
+  local.set $1
+  i32.const 16
   local.get $0
-  i32.load offset=12
-  i32.ge_u
-  if
-   i32.const 1440
-   i32.const 1392
-   i32.const 92
-   i32.const 42
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $0
-  i32.load offset=4
+  call $~lib/rt/tcms/__new
+  local.tee $0
   local.get $1
-  i32.const 2
-  i32.shl
-  i32.add
-  i32.load
+  i32.store
+  local.get $0
+  local.get $1
+  i32.store offset=4
+  local.get $0
+  i32.const 16
+  i32.store offset=8
+  local.get $0
+  i32.const 4
+  i32.store offset=12
+  local.get $0
  )
  (func $src/HeapQueue/HeapQueue#pop (param $0 i32) (result i32)
   (local $1 i32)
@@ -2174,8 +2176,20 @@
   (local $8 f32)
   local.get $0
   i32.load offset=8
-  i32.const 0
-  call $~lib/array/Array<i32>#__get
+  local.tee $1
+  i32.load offset=12
+  i32.eqz
+  if
+   i32.const 1440
+   i32.const 1392
+   i32.const 92
+   i32.const 42
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $1
+  i32.load offset=4
+  i32.load
   local.set $7
   block $folding-inner0
    local.get $0
@@ -2327,29 +2341,6 @@
   i32.const 21
   call $~lib/builtins/abort
   unreachable
- )
- (func $~lib/rt/__newArray (param $0 i32) (result i32)
-  (local $1 i32)
-  i32.const 16
-  i32.const 0
-  call $~lib/rt/tcms/__new
-  local.set $1
-  i32.const 16
-  local.get $0
-  call $~lib/rt/tcms/__new
-  local.tee $0
-  local.get $1
-  i32.store
-  local.get $0
-  local.get $1
-  i32.store offset=4
-  local.get $0
-  i32.const 16
-  i32.store offset=8
-  local.get $0
-  i32.const 4
-  i32.store offset=12
-  local.get $0
  )
  (func $src/index/eikonal (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result f32)
   (local $4 f32)
@@ -2671,9 +2662,10 @@
   (local $10 i32)
   (local $11 i32)
   (local $12 i32)
-  (local $13 f64)
+  (local $13 i32)
   (local $14 i32)
-  (local $15 i32)
+  (local $15 f64)
+  (local $16 i32)
   local.get $0
   local.get $1
   i32.mul
@@ -2758,6 +2750,20 @@
      local.get $8
      f32.const 1e6
      call $~lib/typedarray/Float32Array#__set
+    else
+     local.get $4
+     local.get $8
+     call $~lib/typedarray/Int32Array#__get
+     i32.const 1
+     i32.eq
+     if
+      local.get $6
+      local.get $5
+      local.get $8
+      call $~lib/typedarray/Float32Array#__uget
+      local.get $8
+      call $src/HeapQueue/HeapQueue#push
+     end
     end
     local.get $8
     i32.const 1
@@ -2766,38 +2772,11 @@
     br $for-loop|1
    end
   end
-  i32.const 0
-  local.set $8
-  loop $for-loop|2
-   local.get $8
-   local.get $9
-   i32.lt_s
-   if
-    local.get $4
-    local.get $8
-    call $~lib/typedarray/Int32Array#__get
-    i32.const 1
-    i32.eq
-    if
-     local.get $6
-     local.get $5
-     local.get $8
-     call $~lib/typedarray/Float32Array#__uget
-     local.get $8
-     call $src/HeapQueue/HeapQueue#push
-    end
-    local.get $8
-    i32.const 1
-    i32.add
-    local.set $8
-    br $for-loop|2
-   end
-  end
   call $~lib/array/Array<i32>#constructor
-  local.set $12
+  local.set $14
   i32.const -5
   local.set $3
-  loop $for-loop|3
+  loop $for-loop|2
    local.get $3
    i32.const 5
    i32.le_s
@@ -2812,15 +2791,15 @@
     f64.sqrt
     f64.floor
     i32.trunc_f64_s
-    local.tee $9
+    local.tee $10
     i32.sub
     local.set $8
-    loop $for-loop|4
+    loop $for-loop|3
      local.get $8
-     local.get $9
+     local.get $10
      i32.le_s
      if
-      local.get $12
+      local.get $14
       local.get $3
       local.get $0
       local.get $8
@@ -2831,38 +2810,61 @@
       i32.const 1
       i32.add
       local.set $8
-      br $for-loop|4
+      br $for-loop|3
      end
     end
     local.get $3
     i32.const 1
     i32.add
     local.set $3
-    br $for-loop|3
+    br $for-loop|2
    end
   end
-  loop $while-continue|5
+  i32.const 7
+  call $~lib/rt/__newArray
+  local.tee $10
+  i32.load offset=4
+  drop
+  local.get $10
+  i32.const 0
+  i32.const 0
+  local.get $0
+  i32.sub
+  call $~lib/array/Array<i32>#__uset
+  local.get $10
+  i32.const 1
+  i32.const -1
+  call $~lib/array/Array<i32>#__uset
+  local.get $10
+  i32.const 2
+  local.get $0
+  call $~lib/array/Array<i32>#__uset
+  local.get $10
+  i32.const 3
+  i32.const 1
+  call $~lib/array/Array<i32>#__uset
+  loop $while-continue|4
    local.get $6
    i32.load
    if
     local.get $6
     call $src/HeapQueue/HeapQueue#pop
-    local.tee $11
+    local.tee $13
     local.get $0
     i32.rem_s
     local.set $3
-    local.get $11
+    local.get $13
     local.get $0
     i32.div_s
     f64.convert_i32_s
     f64.floor
-    local.set $13
+    local.set $15
     local.get $4
-    local.get $11
+    local.get $13
     i32.const 0
     call $~lib/typedarray/Int32Array#__set
     i32.const 1
-    local.get $13
+    local.get $15
     local.get $1
     i32.const 1
     i32.sub
@@ -2875,7 +2877,7 @@
     i32.sub
     i32.ge_s
     i32.const 1
-    local.get $13
+    local.get $15
     f64.const 1
     f64.le
     local.get $3
@@ -2884,120 +2886,97 @@
     select
     select
     select
-    br_if $while-continue|5
+    br_if $while-continue|4
     i32.const 0
-    local.set $8
-    loop $for-loop|6
-     local.get $8
+    local.set $12
+    loop $for-loop|5
+     local.get $12
      i32.const 4
      i32.lt_s
      if
-      i32.const 7
-      call $~lib/rt/__newArray
-      local.tee $3
-      i32.load offset=4
-      drop
-      local.get $3
-      i32.const 0
-      i32.const 0
-      local.get $0
-      i32.sub
-      call $~lib/array/Array<i32>#__uset
-      local.get $3
-      i32.const 1
-      i32.const -1
-      call $~lib/array/Array<i32>#__uset
-      local.get $3
-      i32.const 2
-      local.get $0
-      call $~lib/array/Array<i32>#__uset
-      local.get $3
-      i32.const 3
-      i32.const 1
-      call $~lib/array/Array<i32>#__uset
       local.get $4
-      local.get $3
-      local.get $8
-      call $~lib/array/Array<i32>#__get
-      local.get $11
+      local.get $10
+      local.get $12
+      call $~lib/typedarray/Int32Array#__uget
+      local.get $13
       i32.add
       local.tee $3
       call $~lib/typedarray/Int32Array#__get
       if
        i32.const 6
        call $~lib/rt/__newArray
-       local.tee $9
+       local.tee $11
        i32.load offset=4
        drop
-       local.get $9
+       local.get $11
        i32.const 0
        local.get $3
        local.get $0
        i32.sub
-       local.tee $10
+       local.tee $16
        local.get $3
        i32.const 1
        i32.sub
-       local.tee $14
+       local.tee $9
        local.get $4
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $9
+       local.get $11
        i32.const 1
        local.get $0
        local.get $3
        i32.add
-       local.tee $15
-       local.get $14
+       local.tee $8
+       local.get $9
        local.get $4
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $9
+       local.get $11
        i32.const 2
-       local.get $10
+       local.get $16
        local.get $3
        i32.const 1
        i32.add
-       local.tee $10
+       local.tee $9
        local.get $4
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
-       local.get $9
+       local.get $11
        i32.const 3
-       local.get $15
-       local.get $10
+       local.get $8
+       local.get $9
        local.get $4
        local.get $5
        call $src/index/eikonal
        call $~lib/array/Array<f32>#__uset
        i32.const 0
-       local.set $10
+       local.set $9
        f32.const inf
        local.set $7
        loop $for-loop|00
-        local.get $10
         local.get $9
+        local.get $11
         i32.load offset=12
         i32.lt_s
         if
+         local.get $11
          local.get $9
-         local.get $10
          call $~lib/typedarray/Float32Array#__uget
          local.get $7
          f32.lt
          if
+          local.get $11
           local.get $9
-          local.get $10
           call $~lib/typedarray/Float32Array#__uget
           local.set $7
          end
-         local.get $10
+         local.get $9
          i32.const 1
          i32.add
-         local.set $10
+         local.set $9
          br $for-loop|00
         end
        end
@@ -3027,18 +3006,18 @@
         local.get $2
         local.get $0
         local.get $1
-        local.get $12
+        local.get $14
         call $src/index/inpaint_point
        end
       end
-      local.get $8
+      local.get $12
       i32.const 1
       i32.add
-      local.set $8
-      br $for-loop|6
+      local.set $12
+      br $for-loop|5
      end
     end
-    br $while-continue|5
+    br $while-continue|4
    end
   end
  )
