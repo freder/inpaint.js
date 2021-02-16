@@ -10,7 +10,7 @@
   },
   "scripts": {
     "asbuild:untouched": "asc src/index.ts --runtime minimal --exportRuntime --debug --target debug",
-    "asbuild:optimized": "asc src/index.ts --runtime minimal --exportRuntime --target release -O3",
+    "asbuild:optimized": "asc src/index.ts --runtime minimal --exportRuntime --target release -O3 --noAssert",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   }
 }

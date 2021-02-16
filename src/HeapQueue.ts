@@ -6,12 +6,12 @@ function cmp<T>(a: T, b: T): T {
 
 export default class HeapQueue {
 	length: i32;
-	data_u: Array<f32>;
+	data_u: Array<f64>;
 	data_i: Array<i32>;
 
 	constructor() {
 		this.length = 0;
-		this.data_u = new Array<f32>();
+		this.data_u = new Array<f64>();
 		this.data_i = new Array<i32>();
 	}
 
@@ -20,7 +20,7 @@ export default class HeapQueue {
 		return unchecked(this.data[0]);
 	}
 
-	push(val_u: f32, val_i: i32): void {
+	push(val_u: f64, val_i: i32): void {
 		this.data_u.push(val_u);
 		this.data_i.push(val_i);
 
