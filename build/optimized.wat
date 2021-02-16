@@ -1,8 +1,8 @@
 (module
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
  (type $none_=>_none (func))
  (type $i32_i32_f32_=>_none (func (param i32 i32 f32)))
@@ -1389,29 +1389,6 @@
   local.get $2
   i32.store
  )
- (func $~lib/typedarray/Int32Array#__get (param $0 i32) (param $1 i32) (result i32)
-  local.get $1
-  local.get $0
-  i32.load offset=8
-  i32.const 2
-  i32.shr_u
-  i32.ge_u
-  if
-   i32.const 1440
-   i32.const 1504
-   i32.const 699
-   i32.const 64
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $0
-  i32.load offset=4
-  local.get $1
-  i32.const 2
-  i32.shl
-  i32.add
-  i32.load
- )
  (func $~lib/typedarray/Float32Array#__set (param $0 i32) (param $1 i32) (param $2 f32)
   local.get $1
   local.get $0
@@ -2730,7 +2707,7 @@
     local.get $8
     local.get $4
     local.get $8
-    call $~lib/typedarray/Int32Array#__get
+    call $~lib/typedarray/Int32Array#__uget
     i32.const 1
     i32.shl
     local.get $4
@@ -2742,7 +2719,7 @@
     call $~lib/typedarray/Int32Array#__set
     local.get $4
     local.get $8
-    call $~lib/typedarray/Int32Array#__get
+    call $~lib/typedarray/Int32Array#__uget
     i32.const 2
     i32.eq
     if
@@ -2753,7 +2730,7 @@
     else
      local.get $4
      local.get $8
-     call $~lib/typedarray/Int32Array#__get
+     call $~lib/typedarray/Int32Array#__uget
      i32.const 1
      i32.eq
      if
@@ -2901,7 +2878,7 @@
       local.get $13
       i32.add
       local.tee $3
-      call $~lib/typedarray/Int32Array#__get
+      call $~lib/typedarray/Int32Array#__uget
       if
        i32.const 6
        call $~lib/rt/__newArray
@@ -2986,7 +2963,7 @@
        call $~lib/typedarray/Float32Array#__set
        local.get $4
        local.get $3
-       call $~lib/typedarray/Int32Array#__get
+       call $~lib/typedarray/Int32Array#__uget
        i32.const 2
        i32.eq
        if
