@@ -6,11 +6,12 @@ export const Int32Array_ID = idof<Int32Array>();
 
 const LARGE_VALUE = f32(1e6);
 const SMALL_VALUE = f32(1e-6);
+const radius = i32(5);
 
 
 function min<T>(vals: Array<T>): T {
 	let lowest: T = Infinity;
-	for (let i = 0; i < vals.length; ++i) {
+	for (let i = 0; i < vals.length; i++) {
 		if (vals[i] < lowest) {
 			lowest = vals[i];
 		}
@@ -123,18 +124,16 @@ function inpaint_point(
 }
 
 
-export function inpaint(
+function inpaintChannel(
 	width: i32,
 	height: i32,
 	channel: Int32Array,
-	mask: Int32Array
+	mask: Int32Array,
+	flag: Int32Array,
+	u: Float32Array,
+	heap: HeapQueue
 ): void {
-	const radius = 5;
-	const len = channel.length;
-	const size = len;
-
-	const flag = new Int32Array(size);
-	const u = new Float32Array(size);
+	const size = width * height;
 
 	for (let i = 0; i < size; i++) {
 		const maskVal = mask[i];
@@ -158,7 +157,6 @@ export function inpaint(
 		}
 	}
 
-	const heap = new HeapQueue();
 	for (let i = 0; i < size; i++) {
 		if (flag[i] == 1) { // BAND
 			heap.push(u[i], i);
@@ -202,4 +200,22 @@ export function inpaint(
 			}
 		}
 	}
+}
+
+
+export function inpaint(
+	width: i32,
+	height: i32,
+	channelR: Int32Array,
+	channelG: Int32Array,
+	channelB: Int32Array,
+	mask: Int32Array
+): void {
+	const size = width * height;
+	const flag = new Int32Array(size);
+	const u = new Float32Array(size);
+	const heap = new HeapQueue();
+	inpaintChannel(width, height, channelR, mask, flag, u, heap);
+	inpaintChannel(width, height, channelG, mask, flag, u, heap);
+	inpaintChannel(width, height, channelB, mask, flag, u, heap);
 }
