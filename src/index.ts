@@ -1,7 +1,7 @@
 import HeapQueue from './HeapQueue';
 
 
-export const Uint8Array_ID = idof<Uint8Array>();
+export const Int32Array_ID = idof<Int32Array>();
 
 
 const LARGE_VALUE = f32(1e6);
@@ -19,7 +19,7 @@ function min<T>(vals: Array<T>): T {
 }
 
 
-function eikonal(n1: i32, n2: i32, flag: Uint8Array, u: Float32Array): f32 {
+function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float32Array): f32 {
 	let u_out = LARGE_VALUE;
 	const u1 = u[n1];
 	const u2 = u[n2];
@@ -45,7 +45,7 @@ function eikonal(n1: i32, n2: i32, flag: Uint8Array, u: Float32Array): f32 {
 }
 
 
-function grad_func(array: Float32Array, n: i32, step: i32, flag: Uint8Array): f32 {
+function grad_func(array: Float32Array, n: i32, step: i32, flag: Int32Array): f32 {
 	if (flag[n + step] != 2) { // UNKNOWN
 		if (flag[n - step] != 2) {
 			return (array[n + step] - array[n - step]) * 0.5;
@@ -64,9 +64,9 @@ function grad_func(array: Float32Array, n: i32, step: i32, flag: Uint8Array): f3
 
 function inpaint_point(
 	n: i32,
-	flag: Uint8Array,
+	flag: Int32Array,
 	u: Float32Array,
-	image: Uint8Array,
+	image: Int32Array,
 	width: i32,
 	height: i32,
 	indices_centered: Array<i32>
@@ -108,7 +108,7 @@ function inpaint_point(
 		const direction = f32(Math.abs(rx * gradx_u + ry * grady_u));
 		const weight: f32 = geometric_dst * levelset_dst * direction + SMALL_VALUE;
 
-		Ia += weight * image[nb];
+		Ia += weight * f32(image[nb]);
 		norm += weight;
 	}
 	// the fmm.py which this is based on actually implements a slightly different
@@ -118,7 +118,7 @@ function inpaint_point(
 	// which is certainly a possibility and I invested quite a bit of effort into
 	// that hypothesis by way of rewriting and checking every line of code a few
 	// times.
-	image[n] = u8(Ia / norm);
+	image[n] = i32(Ia / norm);
 	// image[n] = Ia / norm + (Jx + Jy) / Math.sqrt(Jx * Jx + Jy * Jy);
 }
 
@@ -126,14 +126,14 @@ function inpaint_point(
 export function inpaint(
 	width: i32,
 	height: i32,
-	channel: Uint8Array,
-	mask: Uint8Array
+	channel: Int32Array,
+	mask: Int32Array
 ): void {
 	const radius = 5;
 	const len = channel.length;
 	const size = len;
 
-	const flag = new Uint8Array(size);
+	const flag = new Int32Array(size);
 	const u = new Float32Array(size);
 
 	for (let i = 0; i < size; i++) {

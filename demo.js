@@ -14,7 +14,7 @@ function createImgCanvas(img) {
 
 function createMask(imgData) {
 	const { data, width, height } = imgData;
-	const mask_u8 = new Uint8Array(width * height);
+	const mask_u8 = new Int32Array(width * height);
 	for (let i = 0; i < data.length / 4; i++) {
 		const Y = (
 			.299 * data[4 * i] +
@@ -59,9 +59,9 @@ function main() {
 			.then((instance) => {
 				const {
 					inpaint,
-					Uint8Array_ID,
+					Int32Array_ID,
 					__newArray,
-					__getUint8ArrayView,
+					__getInt32ArrayView,
 					__pin,
 					__unpin,
 				} = instance.exports;
@@ -71,17 +71,17 @@ function main() {
 				const mask = createMask(imgData);
 
 				const start = Date.now();
-				const maskPtr = __pin(__newArray(Uint8Array_ID, mask));
+				const maskPtr = __pin(__newArray(Int32Array_ID, mask));
 
-				const channel = new Uint8Array(width * height);
+				const channel = new Int32Array(width * height);
 				for (let ch = 0; ch < 3; ch++) {
 					for (let i = 0; i < channel.length; i++) {
 						channel[i] = imgData.data[i * 4 + ch];
 					}
-					const channelPtr = __pin(__newArray(Uint8Array_ID, channel));
+					const channelPtr = __pin(__newArray(Int32Array_ID, channel));
 					inpaint(width, height, channelPtr, maskPtr);
 
-					const channelView = __getUint8ArrayView(channelPtr);
+					const channelView = __getInt32ArrayView(channelPtr);
 					for (let i = 0; i < channelView.length; i++) {
 						imgData.data[i * 4 + ch] = channelView[i];
 					}
