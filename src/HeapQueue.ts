@@ -1,4 +1,5 @@
-function cmp(a: f32, b: f32): f32 {
+@inline
+function cmp<T>(a: T, b: T): T {
 	return a - b;
 }
 
@@ -14,6 +15,7 @@ export default class HeapQueue {
 		this.data_i = new Array<i32>();
 	}
 
+	@inline
 	peek(): i32 {
 		return this.data[0];
 	}
