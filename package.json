@@ -9,8 +9,8 @@
     "assemblyscript": "^0.18.7"
   },
   "scripts": {
-    "asbuild:untouched": "asc src/index.ts --exportRuntime --debug --target debug",
-    "asbuild:optimized": "asc src/index.ts --exportRuntime --target release",
+    "asbuild:untouched": "asc src/index.ts --runtime minimal --exportRuntime --debug --target debug",
+    "asbuild:optimized": "asc src/index.ts --runtime minimal --exportRuntime --target release",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   }
 }

@@ -64,6 +64,7 @@ function main() {
 					__getInt32ArrayView,
 					__pin,
 					__unpin,
+					__collect,
 				} = instance.exports;
 				// console.log(instance.exports);
 
@@ -102,6 +103,7 @@ function main() {
 				console.log(`${dur} seconds`);
 
 				ctx.putImageData(imgData, 0, 0);
+				__collect();
 			});
 	};
 	img.src = 'skid.jpg';
