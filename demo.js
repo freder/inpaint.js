@@ -51,7 +51,8 @@ function main() {
 
 		loader
 			.instantiateStreaming(
-				fetch('/build/untouched.wasm'),
+				// fetch('/build/untouched.wasm'),
+				fetch('/build/optimized.wasm'),
 				{
 					env: { abort: logError }
 				}
