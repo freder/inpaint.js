@@ -1,19 +1,19 @@
 (module
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
- (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
+ (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
  (type $none_=>_none (func))
  (type $i32_i32_f32_=>_none (func (param i32 i32 f32)))
  (type $i32_i32_i32_i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32 i32 i32 i32)))
- (type $i32_i32_=>_f32 (func (param i32 i32) (result f32)))
  (type $i32_i32_i32_i32_=>_f32 (func (param i32 i32 i32 i32) (result f32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32 i32 i32)))
  (type $i32_f32_i32_=>_none (func (param i32 f32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
+ (type $i32_i32_=>_f32 (func (param i32 i32) (result f32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 1036) ",")
@@ -1356,21 +1356,7 @@
   i32.store offset=12
   local.get $0
  )
- (func $~lib/typedarray/Int32Array#__get (param $0 i32) (param $1 i32) (result i32)
-  local.get $1
-  local.get $0
-  i32.load offset=8
-  i32.const 2
-  i32.shr_u
-  i32.ge_u
-  if
-   i32.const 1440
-   i32.const 1504
-   i32.const 699
-   i32.const 64
-   call $~lib/builtins/abort
-   unreachable
-  end
+ (func $~lib/typedarray/Int32Array#__uget (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.load offset=4
   local.get $1
@@ -1403,6 +1389,29 @@
   local.get $2
   i32.store
  )
+ (func $~lib/typedarray/Int32Array#__get (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
+  local.get $0
+  i32.load offset=8
+  i32.const 2
+  i32.shr_u
+  i32.ge_u
+  if
+   i32.const 1440
+   i32.const 1504
+   i32.const 699
+   i32.const 64
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.const 2
+  i32.shl
+  i32.add
+  i32.load
+ )
  (func $~lib/typedarray/Float32Array#__set (param $0 i32) (param $1 i32) (param $2 f32)
   local.get $1
   local.get $0
@@ -1427,21 +1436,7 @@
   local.get $2
   f32.store
  )
- (func $~lib/typedarray/Float32Array#__get (param $0 i32) (param $1 i32) (result f32)
-  local.get $1
-  local.get $0
-  i32.load offset=8
-  i32.const 2
-  i32.shr_u
-  i32.ge_u
-  if
-   i32.const 1440
-   i32.const 1504
-   i32.const 1239
-   i32.const 64
-   call $~lib/builtins/abort
-   unreachable
-  end
+ (func $~lib/typedarray/Float32Array#__uget (param $0 i32) (param $1 i32) (result f32)
   local.get $0
   i32.load offset=4
   local.get $1
@@ -1946,48 +1941,6 @@
   local.get $3
   i32.store offset=12
  )
- (func $~lib/array/Array<f32>#__get (param $0 i32) (param $1 i32) (result f32)
-  local.get $1
-  local.get $0
-  i32.load offset=12
-  i32.ge_u
-  if
-   i32.const 1440
-   i32.const 1392
-   i32.const 92
-   i32.const 42
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $0
-  i32.load offset=4
-  local.get $1
-  i32.const 2
-  i32.shl
-  i32.add
-  f32.load
- )
- (func $~lib/array/Array<i32>#__get (param $0 i32) (param $1 i32) (result i32)
-  local.get $1
-  local.get $0
-  i32.load offset=12
-  i32.ge_u
-  if
-   i32.const 1440
-   i32.const 1392
-   i32.const 92
-   i32.const 42
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $0
-  i32.load offset=4
-  local.get $1
-  i32.const 2
-  i32.shl
-  i32.add
-  i32.load
- )
  (func $~lib/array/Array<f32>#__uset (param $0 i32) (param $1 i32) (param $2 f32)
   local.get $0
   i32.load offset=4
@@ -2080,12 +2033,12 @@
   local.get $0
   i32.load offset=4
   local.get $1
-  call $~lib/array/Array<f32>#__get
+  call $~lib/typedarray/Float32Array#__uget
   local.set $3
   local.get $0
   i32.load offset=8
   local.get $1
-  call $~lib/array/Array<i32>#__get
+  call $~lib/typedarray/Int32Array#__uget
   local.set $4
   local.get $0
   i32.load offset=4
@@ -2093,7 +2046,7 @@
   local.get $0
   i32.load offset=4
   local.get $2
-  call $~lib/array/Array<f32>#__get
+  call $~lib/typedarray/Float32Array#__uget
   call $~lib/array/Array<f32>#__set
   local.get $0
   i32.load offset=8
@@ -2101,7 +2054,7 @@
   local.get $0
   i32.load offset=8
   local.get $2
-  call $~lib/array/Array<i32>#__get
+  call $~lib/typedarray/Int32Array#__uget
   call $~lib/array/Array<i32>#__set
   local.get $0
   i32.load offset=4
@@ -2158,7 +2111,7 @@
     local.get $0
     i32.load offset=4
     local.get $2
-    call $~lib/array/Array<f32>#__get
+    call $~lib/typedarray/Float32Array#__uget
     local.get $0
     i32.load offset=4
     local.get $2
@@ -2167,7 +2120,7 @@
     i32.const 1
     i32.shr_u
     local.tee $3
-    call $~lib/array/Array<f32>#__get
+    call $~lib/typedarray/Float32Array#__uget
     f32.sub
     f32.const 0
     f32.lt
@@ -2188,6 +2141,27 @@
   i32.const 1
   i32.add
   i32.store
+ )
+ (func $~lib/array/Array<i32>#__get (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
+  local.get $0
+  i32.load offset=12
+  i32.ge_u
+  if
+   i32.const 1440
+   i32.const 1392
+   i32.const 92
+   i32.const 42
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.const 2
+  i32.shl
+  i32.add
+  i32.load
  )
  (func $src/HeapQueue/HeapQueue#pop (param $0 i32) (result i32)
   (local $1 i32)
@@ -2301,11 +2275,11 @@
       local.get $0
       i32.load offset=4
       local.get $3
-      call $~lib/array/Array<f32>#__get
+      call $~lib/typedarray/Float32Array#__uget
       local.get $0
       i32.load offset=4
       local.get $1
-      call $~lib/array/Array<f32>#__get
+      call $~lib/typedarray/Float32Array#__uget
       f32.sub
       f32.const 0
       f32.lt
@@ -2321,11 +2295,11 @@
       local.get $0
       i32.load offset=4
       local.get $4
-      call $~lib/array/Array<f32>#__get
+      call $~lib/typedarray/Float32Array#__uget
       local.get $0
       i32.load offset=4
       local.get $2
-      call $~lib/array/Array<f32>#__get
+      call $~lib/typedarray/Float32Array#__uget
       f32.sub
       f32.const 0
       f32.lt
@@ -2384,15 +2358,15 @@
   (local $7 f32)
   local.get $3
   local.get $0
-  call $~lib/typedarray/Float32Array#__get
+  call $~lib/typedarray/Float32Array#__uget
   local.set $5
   local.get $3
   local.get $1
-  call $~lib/typedarray/Float32Array#__get
+  call $~lib/typedarray/Float32Array#__uget
   local.set $6
   local.get $2
   local.get $0
-  call $~lib/typedarray/Int32Array#__get
+  call $~lib/typedarray/Int32Array#__uget
   if (result f32)
    f32.const 1e6
    local.get $6
@@ -2400,12 +2374,12 @@
    f32.add
    local.get $2
    local.get $1
-   call $~lib/typedarray/Int32Array#__get
+   call $~lib/typedarray/Int32Array#__uget
    select
   else
    local.get $2
    local.get $1
-   call $~lib/typedarray/Int32Array#__get
+   call $~lib/typedarray/Int32Array#__uget
    if (result f32)
     local.get $5
     f32.const 1
@@ -2465,7 +2439,7 @@
   local.get $1
   local.get $2
   i32.add
-  call $~lib/typedarray/Int32Array#__get
+  call $~lib/typedarray/Int32Array#__uget
   i32.const 2
   i32.ne
   if (result f32)
@@ -2473,7 +2447,7 @@
    local.get $1
    local.get $2
    i32.sub
-   call $~lib/typedarray/Int32Array#__get
+   call $~lib/typedarray/Int32Array#__uget
    i32.const 2
    i32.ne
    if (result f32)
@@ -2481,12 +2455,12 @@
     local.get $1
     local.get $2
     i32.add
-    call $~lib/typedarray/Float32Array#__get
+    call $~lib/typedarray/Float32Array#__uget
     local.get $0
     local.get $1
     local.get $2
     i32.sub
-    call $~lib/typedarray/Float32Array#__get
+    call $~lib/typedarray/Float32Array#__uget
     f32.sub
     f32.const 0.5
     f32.mul
@@ -2495,10 +2469,10 @@
     local.get $1
     local.get $2
     i32.add
-    call $~lib/typedarray/Float32Array#__get
+    call $~lib/typedarray/Float32Array#__uget
     local.get $0
     local.get $1
-    call $~lib/typedarray/Float32Array#__get
+    call $~lib/typedarray/Float32Array#__uget
     f32.sub
    end
   else
@@ -2506,18 +2480,18 @@
    local.get $1
    local.get $2
    i32.sub
-   call $~lib/typedarray/Int32Array#__get
+   call $~lib/typedarray/Int32Array#__uget
    i32.const 2
    i32.ne
    if (result f32)
     local.get $0
     local.get $1
-    call $~lib/typedarray/Float32Array#__get
+    call $~lib/typedarray/Float32Array#__uget
     local.get $0
     local.get $1
     local.get $2
     i32.sub
-    call $~lib/typedarray/Float32Array#__get
+    call $~lib/typedarray/Float32Array#__uget
     f32.sub
    else
     f32.const 0
@@ -2570,7 +2544,7 @@
      i32.const 1
      local.get $6
      local.get $10
-     call $~lib/array/Array<i32>#__get
+     call $~lib/typedarray/Int32Array#__uget
      local.get $0
      i32.add
      local.tee $8
@@ -2606,7 +2580,7 @@
      br_if $for-continue|0
      local.get $1
      local.get $8
-     call $~lib/typedarray/Int32Array#__get
+     call $~lib/typedarray/Int32Array#__uget
      br_if $for-continue|0
      local.get $7
      f64.const 1
@@ -2637,10 +2611,10 @@
      f64.const 1
      local.get $2
      local.get $8
-     call $~lib/typedarray/Float32Array#__get
+     call $~lib/typedarray/Float32Array#__uget
      local.get $2
      local.get $0
-     call $~lib/typedarray/Float32Array#__get
+     call $~lib/typedarray/Float32Array#__uget
      f32.sub
      f64.promote_f32
      f64.abs
@@ -2665,7 +2639,7 @@
      local.tee $9
      local.get $3
      local.get $8
-     call $~lib/typedarray/Int32Array#__get
+     call $~lib/typedarray/Int32Array#__uget
      f32.convert_i32_s
      f32.mul
      f32.add
@@ -2711,7 +2685,7 @@
    if
     local.get $3
     local.get $8
-    call $~lib/typedarray/Int32Array#__get
+    call $~lib/typedarray/Int32Array#__uget
     if
      local.get $4
      local.get $8
@@ -2758,7 +2732,7 @@
    if
     local.get $3
     local.get $8
-    call $~lib/typedarray/Int32Array#__get
+    call $~lib/typedarray/Int32Array#__uget
     local.set $10
     local.get $4
     local.get $8
@@ -2769,7 +2743,7 @@
     i32.shl
     local.get $4
     local.get $8
-    call $~lib/typedarray/Int32Array#__get
+    call $~lib/typedarray/Int32Array#__uget
     local.get $10
     i32.xor
     i32.sub
@@ -2808,7 +2782,7 @@
      local.get $6
      local.get $5
      local.get $8
-     call $~lib/typedarray/Float32Array#__get
+     call $~lib/typedarray/Float32Array#__uget
      local.get $8
      call $src/HeapQueue/HeapQueue#push
     end
@@ -3011,13 +2985,13 @@
         if
          local.get $9
          local.get $10
-         call $~lib/array/Array<f32>#__get
+         call $~lib/typedarray/Float32Array#__uget
          local.get $7
          f32.lt
          if
           local.get $9
           local.get $10
-          call $~lib/array/Array<f32>#__get
+          call $~lib/typedarray/Float32Array#__uget
           local.set $7
          end
          local.get $10
@@ -3044,7 +3018,7 @@
         local.get $6
         local.get $5
         local.get $3
-        call $~lib/typedarray/Float32Array#__get
+        call $~lib/typedarray/Float32Array#__uget
         local.get $3
         call $src/HeapQueue/HeapQueue#push
         local.get $3

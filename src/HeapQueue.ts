@@ -17,7 +17,7 @@ export default class HeapQueue {
 
 	@inline
 	peek(): i32 {
-		return this.data[0];
+		return unchecked(this.data[0]);
 	}
 
 	push(val_u: f32, val_i: i32): void {
@@ -27,7 +27,7 @@ export default class HeapQueue {
 		let pos = this.data_u.length - 1;
 		while (pos > 0) {
 			const parent = (pos - 1) >>> 1;
-			if (cmp(this.data_u[pos], this.data_u[parent]) < 0) {
+			if (cmp(unchecked(this.data_u[pos]), unchecked(this.data_u[parent])) < 0) {
 				this.swap(parent, pos);
 				pos = parent;
 			} else {
@@ -39,7 +39,7 @@ export default class HeapQueue {
 	}
 
 	pop(): i32 {
-		const ret = this.data_i[0];
+		const ret = unchecked(this.data_i)[0];
 		const last_val_u = this.data_u.pop();
 		const last_val_i = this.data_i.pop();
 		this.length--;
@@ -56,13 +56,13 @@ export default class HeapQueue {
 				let minIndex = pos;
 				if (
 					left <= last &&
-					cmp(this.data_u[left], this.data_u[minIndex]) < 0
+					cmp(unchecked(this.data_u[left]), unchecked(this.data_u[minIndex])) < 0
 				) {
 					minIndex = left;
 				}
 				if (
 					right <= last &&
-					cmp(this.data_u[right], this.data_u[minIndex]) < 0
+					cmp(unchecked(this.data_u[right]), unchecked(this.data_u[minIndex])) < 0
 				) {
 					minIndex = right;
 				}
@@ -79,11 +79,11 @@ export default class HeapQueue {
 	}
 
 	swap(i1: i32, i2: i32): void {
-		const tmp_u = this.data_u[i1];
-		const tmp_i = this.data_i[i1];
+		const tmp_u = unchecked(this.data_u[i1]);
+		const tmp_i = unchecked(this.data_i[i1]);
 
-		this.data_u[i1] = this.data_u[i2];
-		this.data_i[i1] = this.data_i[i2];
+		this.data_u[i1] = unchecked(this.data_u[i2]);
+		this.data_i[i1] = unchecked(this.data_i[i2]);
 
 		this.data_u[i2] = tmp_u;
 		this.data_i[i2] = tmp_i;

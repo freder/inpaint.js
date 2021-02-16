@@ -12,8 +12,8 @@ const radius = i32(5);
 function min<T>(vals: Array<T>): T {
 	let lowest: T = Infinity;
 	for (let i = 0; i < vals.length; i++) {
-		if (vals[i] < lowest) {
-			lowest = vals[i];
+		if (unchecked(vals[i]) < lowest) {
+			lowest = unchecked(vals[i]);
 		}
 	}
 	return lowest;
@@ -22,10 +22,10 @@ function min<T>(vals: Array<T>): T {
 
 function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float32Array): f32 {
 	let u_out = LARGE_VALUE;
-	const u1 = u[n1];
-	const u2 = u[n2];
-	if (flag[n1] == 0) {
-		if (flag[n2] == 0) {
+	const u1 = unchecked(u[n1]);
+	const u2 = unchecked(u[n2]);
+	if (unchecked(flag[n1]) == 0) {
+		if (unchecked(flag[n2]) == 0) {
 			const perp = f32(Math.sqrt(2 - (u1 - u2) * (u1 - u2)));
 			let s = f32((u1 + u2 - perp) * 0.5);
 			if (s >= u1 && s >= u2) {
@@ -39,7 +39,7 @@ function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float32Array): f32 {
 		} else {
 			u_out = (1 + u1);
 		}
-	} else if (flag[n2] == 0) {
+	} else if (unchecked(flag[n2]) == 0) {
 		u_out = (1 + u2);
 	}
 	return u_out;
@@ -47,15 +47,15 @@ function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float32Array): f32 {
 
 
 function grad_func(array: Float32Array, n: i32, step: i32, flag: Int32Array): f32 {
-	if (flag[n + step] != 2) { // UNKNOWN
-		if (flag[n - step] != 2) {
-			return (array[n + step] - array[n - step]) * 0.5;
+	if (unchecked(flag[n + step]) != 2) { // UNKNOWN
+		if (unchecked(flag[n - step]) != 2) {
+			return (unchecked(array[n + step]) - unchecked(array[n - step])) * 0.5;
 		} else {
-			return array[n + step] - array[n];
+			return unchecked(array[n + step]) - unchecked(array[n]);
 		}
 	} else {
-		if (flag[n - step] != 2) {
-			return array[n] - array[n - step];
+		if (unchecked(flag[n - step]) != 2) {
+			return unchecked(array[n]) - unchecked(array[n - step]);
 		} else {
 			return 0;
 		}
@@ -82,7 +82,7 @@ function inpaint_point(
 	const j = i32(Math.floor(n / width));
 
 	for (let k = 0; k < indices_centered.length; k++) {
-		const nb = n + indices_centered[k];
+		const nb = n + unchecked(indices_centered[k]);
 		const i_nb = nb % width;
 		const j_nb = Math.floor(nb / width);
 
@@ -95,7 +95,7 @@ function inpaint_point(
 			continue;
 		}
 
-		if (flag[nb] != 0 /*KNOWN*/) {
+		if (unchecked(flag[nb]) != 0 /*KNOWN*/) {
 			continue;
 		}
 
@@ -105,11 +105,11 @@ function inpaint_point(
 		const ry2 = ry * ry;
 
 		const geometric_dst = f32(1 / ((rx2 + ry2) * Math.sqrt(rx2 + ry2)));
-		const levelset_dst = f32(1 / (1 + Math.abs(u[nb] - u[n])));
+		const levelset_dst = f32(1 / (1 + Math.abs(unchecked(u[nb]) - unchecked(u[n]))));
 		const direction = f32(Math.abs(rx * gradx_u + ry * grady_u));
 		const weight: f32 = geometric_dst * levelset_dst * direction + SMALL_VALUE;
 
-		Ia += weight * f32(image[nb]);
+		Ia += weight * f32(unchecked(image[nb]));
 		norm += weight;
 	}
 	// the fmm.py which this is based on actually implements a slightly different
@@ -136,7 +136,7 @@ function inpaintChannel(
 	const size = width * height;
 
 	for (let i = 0; i < size; i++) {
-		const maskVal = mask[i];
+		const maskVal = unchecked(mask[i]);
 		if (!maskVal) {
 			continue;
 		}
@@ -150,8 +150,8 @@ function inpaintChannel(
 	}
 
 	for (let i = 0; i < size; i++) {
-		const maskVal = mask[i];
-		flag[i] = flag[i] * 2 - (maskVal ^ flag[i]);
+		const maskVal = unchecked(mask[i]);
+		flag[i] = flag[i] * 2 - (maskVal ^ unchecked(flag[i]));
 		if (flag[i] == 2) { // UNKNOWN
 			u[i] = LARGE_VALUE;
 		}
@@ -159,7 +159,7 @@ function inpaintChannel(
 
 	for (let i = 0; i < size; i++) {
 		if (flag[i] == 1) { // BAND
-			heap.push(u[i], i);
+			heap.push(unchecked(u[i]), i);
 		}
 	}
 
@@ -194,7 +194,7 @@ function inpaintChannel(
 				]);
 				if (flag[nb] == 2) { // UNKNOWN
 					flag[nb] = 1; // BAND
-					heap.push(u[nb], nb);
+					heap.push(unchecked(u[nb]), nb);
 					inpaint_point(nb, flag, u, channel, width, height, indices_centered);
 				}
 			}
