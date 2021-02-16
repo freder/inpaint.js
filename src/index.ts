@@ -8,11 +8,6 @@ const LARGE_VALUE = f32(1e6);
 const SMALL_VALUE = f32(1e-6);
 
 
-export function getMemorySize(): i32 {
-	return memory.size();
-}
-
-
 function min<T>(vals: Array<T>): T {
 	let lowest: T = Infinity;
 	for (let i = 0; i < vals.length; ++i) {
@@ -137,22 +132,11 @@ export function inpaint(
 	const radius = 5;
 	const len = channel.length;
 	const size = len;
-	// const size = width * height;
-	// const len = size * 1;
-
-	// trace(len.toString());
-
-	const image = new Uint8Array(len);
-	for (let i = 0; i < len; i++) {
-		image[i] = channel[i];
-	}
 
 	const flag = new Uint8Array(size);
 	const u = new Float32Array(size);
 
 	for (let i = 0; i < size; i++) {
-		// const maskI = i + len;
-		// const maskVal = load<u8>(maskI);
 		const maskVal = mask[i];
 		if (!maskVal) {
 			continue;
@@ -165,7 +149,7 @@ export function inpaint(
 		flag[i + width] = 1;
 		flag[i - width] = 1;
 	}
-	// TODO: combine loops ↑↓
+
 	for (let i = 0; i < size; i++) {
 		const maskVal = mask[i];
 		flag[i] = flag[i] * 2 - (maskVal ^ flag[i]);
@@ -213,14 +197,9 @@ export function inpaint(
 				if (flag[nb] == 2) { // UNKNOWN
 					flag[nb] = 1; // BAND
 					heap.push(u[nb], nb);
-					inpaint_point(nb, flag, u, image, width, height, indices_centered);
+					inpaint_point(nb, flag, u, channel, width, height, indices_centered);
 				}
 			}
 		}
-	}
-	// return image;
-
-	for (let i = 0; i < len; i++) {
-		channel[i] = image[i];
 	}
 }
