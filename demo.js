@@ -69,6 +69,8 @@ function main() {
 
 				const imgData = ctx.getImageData(0, 0, width, height);
 				const mask = createMask(imgData);
+
+				const start = Date.now();
 				const maskPtr = __pin(__newArray(Uint8Array_ID, mask));
 
 				const channel = new Uint8Array(width * height);
@@ -85,9 +87,12 @@ function main() {
 					}
 					__unpin(channelPtr);
 				}
+				__unpin(maskPtr);
+
+				const dur = (Date.now() - start) / 1000;
+				console.log(`${dur} seconds`);
 
 				ctx.putImageData(imgData, 0, 0);
-				__unpin(maskPtr);
 			});
 	};
 	img.src = 'skid.jpg';
