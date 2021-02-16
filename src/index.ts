@@ -131,11 +131,11 @@ function inpaintChannel(
 	height: i32,
 	channel: Int32Array,
 	mask: Int32Array,
-	flag: Int32Array,
-	u: Float32Array,
 	heap: HeapQueue
 ): void {
 	const size = width * height;
+	const flag = new Int32Array(size);
+	const u = new Float32Array(size);
 
 	for (let i = 0; i < size; i++) {
 		if (!unchecked(mask[i])) {
@@ -205,16 +205,27 @@ function inpaintChannel(
 export function inpaint(
 	width: i32,
 	height: i32,
-	channelR: Int32Array,
-	channelG: Int32Array,
-	channelB: Int32Array,
+	img: Int32Array,
 	mask: Int32Array
 ): void {
 	const size = width * height;
-	const flag = new Int32Array(size);
-	const u = new Float32Array(size);
+	const channelR = new Int32Array(size);
+	const channelG = new Int32Array(size);
+	const channelB = new Int32Array(size);
+	for (let i = 0; i < size; i++) {
+		const i4 = i * 4;
+		unchecked(channelR[i] = img[i4 + 0]);
+		unchecked(channelG[i] = img[i4 + 1]);
+		unchecked(channelB[i] = img[i4 + 2]);
+	}
 	const heap = new HeapQueue();
-	inpaintChannel(width, height, channelR, mask, flag, u, heap);
-	inpaintChannel(width, height, channelG, mask, flag, u, heap);
-	inpaintChannel(width, height, channelB, mask, flag, u, heap);
+	inpaintChannel(width, height, channelR, mask, heap);
+	inpaintChannel(width, height, channelG, mask, heap);
+	inpaintChannel(width, height, channelB, mask, heap);
+	for (let i = 0; i < size; i++) {
+		const i4 = i * 4;
+		unchecked(img[i4 + 0] = channelR[i]);
+		unchecked(img[i4 + 1] = channelG[i]);
+		unchecked(img[i4 + 2] = channelB[i]);
+	}
 }

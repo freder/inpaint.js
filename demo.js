@@ -51,7 +51,8 @@ function main() {
 
 		loader
 			.instantiateStreaming(
-				fetch('/build/optimized.wasm'), // untouched.wasm
+				// fetch('/build/untouched.wasm'),
+				fetch('/build/optimized.wasm'),
 				{
 					env: { abort: logError }
 				}
@@ -68,41 +69,25 @@ function main() {
 				} = instance.exports;
 				// console.log(instance.exports);
 
-				const len = width * height;
-
 				const imgData = ctx.getImageData(0, 0, width, height);
 				const mask = createMask(imgData);
 
 				const start = Date.now();
 				const maskPtr = __pin(__newArray(Int32Array_ID, mask));
+				const imgPtr = __pin(__newArray(Int32Array_ID, imgData.data));
 
-				const channelR = new Int32Array(len);
-				const channelG = new Int32Array(len);
-				const channelB = new Int32Array(len);
-				const rgbPointers = [channelR, channelG, channelB]
-					.map((channel, ch) => {
-						for (let i = 0; i < channel.length; i++) {
-							channel[i] = imgData.data[i * 4 + ch];
-						}
-						const channelPtr = __pin(__newArray(Int32Array_ID, channel));
-						return channelPtr;
-					});
+				inpaint(width, height, imgPtr, maskPtr);
 
-				inpaint(width, height, ...rgbPointers, maskPtr);
-
-				rgbPointers.forEach((channelPtr, ch) => {
-					const channelView = __getInt32ArrayView(channelPtr);
-					for (let i = 0; i < channelView.length; i++) {
-						imgData.data[i * 4 + ch] = channelView[i];
-					}
-					__unpin(channelPtr);
-				});
-				__unpin(maskPtr);
+				const imgView = __getInt32ArrayView(imgPtr);
 
 				const dur = (Date.now() - start) / 1000;
 				console.log(`${dur} seconds`);
 
+				imgData.data.set(imgView);
 				ctx.putImageData(imgData, 0, 0);
+
+				__unpin(imgPtr);
+				__unpin(maskPtr);
 				__collect();
 			});
 	};
