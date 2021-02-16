@@ -24,22 +24,24 @@ function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float32Array): f32 {
 	let u_out = LARGE_VALUE;
 	const u1 = unchecked(u[n1]);
 	const u2 = unchecked(u[n2]);
-	if (unchecked(flag[n1]) == 0) {
-		if (unchecked(flag[n2]) == 0) {
+	const f1 = unchecked(flag[n1]);
+	const f2 = unchecked(flag[n2]);
+	if (f1 == 0) {
+		if (f2 == 0) {
 			const perp = f32(Math.sqrt(2 - (u1 - u2) * (u1 - u2)));
 			let s = f32((u1 + u2 - perp) * 0.5);
 			if (s >= u1 && s >= u2) {
-				u_out = (s);
+				u_out = s;
 			} else {
 				s += perp;
 				if (s >= u1 && s >= u2) {
-					u_out = (s);
+					u_out = s;
 				}
 			}
 		} else {
-			u_out = (1 + u1);
+			u_out = 1 + u1;
 		}
-	} else if (unchecked(flag[n2]) == 0) {
+	} else if (f2 == 0) {
 		u_out = (1 + u2);
 	}
 	return u_out;
@@ -49,13 +51,13 @@ function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float32Array): f32 {
 function grad_func(array: Float32Array, n: i32, step: i32, flag: Int32Array): f32 {
 	if (unchecked(flag[n + step]) != 2) { // UNKNOWN
 		if (unchecked(flag[n - step]) != 2) {
-			return (unchecked(array[n + step]) - unchecked(array[n - step])) * 0.5;
+			return (unchecked(array[n + step] - array[n - step])) * 0.5;
 		} else {
-			return unchecked(array[n + step]) - unchecked(array[n]);
+			return unchecked(array[n + step] - array[n]);
 		}
 	} else {
 		if (unchecked(flag[n - step]) != 2) {
-			return unchecked(array[n]) - unchecked(array[n - step]);
+			return unchecked(array[n] - array[n - step]);
 		} else {
 			return 0;
 		}
@@ -136,24 +138,22 @@ function inpaintChannel(
 	const size = width * height;
 
 	for (let i = 0; i < size; i++) {
-		const maskVal = unchecked(mask[i]);
-		if (!maskVal) {
+		if (!unchecked(mask[i])) {
 			continue;
 		}
 		// this is the equivalent of doing a morphological dilation with
 		// a 1-pixel cross structuring element for first pass through flag
-		flag[i + 1]     = 1;
-		flag[i]         = 1;
-		flag[i - 1]     = 1;
-		flag[i + width] = 1;
-		flag[i - width] = 1;
+		unchecked(flag[i + 1]     = 1);
+		unchecked(flag[i]         = 1);
+		unchecked(flag[i - 1]     = 1);
+		unchecked(flag[i + width] = 1);
+		unchecked(flag[i - width] = 1);
 	}
 
 	for (let i = 0; i < size; i++) {
-		const maskVal = unchecked(mask[i]);
-		flag[i] = unchecked(flag[i]) * 2 - (maskVal ^ unchecked(flag[i]));
+		unchecked(flag[i] = flag[i] * 2 - (mask[i] ^ flag[i]));
 		if (unchecked(flag[i]) == 2) { // UNKNOWN
-			u[i] = LARGE_VALUE;
+			unchecked(u[i] = LARGE_VALUE);
 		} else if (unchecked(flag[i]) == 1) { // BAND
 			heap.push(unchecked(u[i]), i);
 		}
@@ -183,14 +183,16 @@ function inpaintChannel(
 		for (let k = 0; k < 4; k++) {
 			const nb = n + unchecked(a[k]);
 			if (unchecked(flag[nb]) != 0) { // not KNOWN
-				u[nb] = min([
-					eikonal(nb - width, nb - 1, flag, u),
-					eikonal(nb + width, nb - 1, flag, u),
-					eikonal(nb - width, nb + 1, flag, u),
-					eikonal(nb + width, nb + 1, flag, u),
-				]);
+				unchecked(
+					u[nb] = min([
+						eikonal(nb - width, nb - 1, flag, u),
+						eikonal(nb + width, nb - 1, flag, u),
+						eikonal(nb - width, nb + 1, flag, u),
+						eikonal(nb + width, nb + 1, flag, u),
+					])
+				);
 				if (unchecked(flag[nb]) == 2) { // UNKNOWN
-					flag[nb] = 1; // BAND
+					unchecked(flag[nb] = 1); // BAND
 					heap.push(unchecked(u[nb]), nb);
 					inpaint_point(nb, flag, u, channel, width, height, indices_centered);
 				}

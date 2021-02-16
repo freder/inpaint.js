@@ -39,14 +39,14 @@ export default class HeapQueue {
 	}
 
 	pop(): i32 {
-		const ret = unchecked(this.data_i)[0];
+		const ret = unchecked(this.data_i[0]);
 		const last_val_u = this.data_u.pop();
 		const last_val_i = this.data_i.pop();
 		this.length--;
 
 		if (this.data_u.length > 0) {
-			this.data_u[0] = last_val_u;
-			this.data_i[0] = last_val_i;
+			unchecked(this.data_u[0] = last_val_u);
+			unchecked(this.data_i[0] = last_val_i);
 
 			let pos: i32 = 0;
 			const last = this.data_u.length - 1;
@@ -82,10 +82,10 @@ export default class HeapQueue {
 		const tmp_u = unchecked(this.data_u[i1]);
 		const tmp_i = unchecked(this.data_i[i1]);
 
-		this.data_u[i1] = unchecked(this.data_u[i2]);
-		this.data_i[i1] = unchecked(this.data_i[i2]);
+		unchecked(this.data_u[i1] = this.data_u[i2]);
+		unchecked(this.data_i[i1] = this.data_i[i2]);
 
-		this.data_u[i2] = tmp_u;
-		this.data_i[i2] = tmp_i;
+		unchecked(this.data_u[i2] = tmp_u);
+		unchecked(this.data_i[i2] = tmp_i);
 	}
 }
