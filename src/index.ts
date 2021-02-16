@@ -1,12 +1,20 @@
 import HeapQueue from './HeapQueue';
 
 
+export const Uint8Array_ID = idof<Uint8Array>();
+
+
 const LARGE_VALUE = f32(1e6);
 const SMALL_VALUE = f32(1e-6);
 
 
-function min<t>(vals: Array<t>): t {
-	let lowest: t = Infinity;
+export function getMemorySize(): i32 {
+	return memory.size();
+}
+
+
+function min<T>(vals: Array<T>): T {
+	let lowest: T = Infinity;
 	for (let i = 0; i < vals.length; ++i) {
 		if (vals[i] < lowest) {
 			lowest = vals[i];
@@ -63,7 +71,7 @@ function inpaint_point(
 	n: i32,
 	flag: Uint8Array,
 	u: Float32Array,
-	image: Uint8Array, // TODO: ?
+	image: Uint8Array,
 	width: i32,
 	height: i32,
 	indices_centered: Array<i32>
@@ -79,8 +87,8 @@ function inpaint_point(
 
 	for (let k = 0; k < indices_centered.length; k++) {
 		const nb = n + indices_centered[k];
-		const i_nb = nb % width,
-			j_nb = Math.floor(nb / width);
+		const i_nb = nb % width;
+		const j_nb = Math.floor(nb / width);
 
 		if (
 			i_nb <= 1 ||
@@ -120,27 +128,32 @@ function inpaint_point(
 }
 
 
-export function inpaint(width: i32, height: i32): void {
+export function inpaint(
+	width: i32,
+	height: i32,
+	channel: Uint8Array,
+	mask: Uint8Array
+): void {
 	const radius = 5;
-	const size = width * height;
-	const len = size * 4;
+	const len = channel.length;
+	const size = len;
+	// const size = width * height;
+	// const len = size * 1;
+
+	// trace(len.toString());
 
 	const image = new Uint8Array(len);
-	for (let i = 0; i < len; i += 4) {
-		image[i + 0] = load<u8>(i + 0);
-		image[i + 1] = load<u8>(i + 1);
-		image[i + 2] = load<u8>(i + 2);
-		image[i + 3] = load<u8>(i + 3);
+	for (let i = 0; i < len; i++) {
+		image[i] = channel[i];
 	}
 
 	const flag = new Uint8Array(size);
 	const u = new Float32Array(size);
 
 	for (let i = 0; i < size; i++) {
-		const imgI = i;
-		const maskI = i + len;
-
-		const maskVal = load<u8>(maskI);
+		// const maskI = i + len;
+		// const maskVal = load<u8>(maskI);
+		const maskVal = mask[i];
 		if (!maskVal) {
 			continue;
 		}
@@ -152,10 +165,9 @@ export function inpaint(width: i32, height: i32): void {
 		flag[i + width] = 1;
 		flag[i - width] = 1;
 	}
-
+	// TODO: combine loops ↑↓
 	for (let i = 0; i < size; i++) {
-		const maskI = i + len;
-		const maskVal = load<u8>(maskI);
+		const maskVal = mask[i];
 		flag[i] = flag[i] * 2 - (maskVal ^ flag[i]);
 		if (flag[i] == 2) { // UNKNOWN
 			u[i] = LARGE_VALUE;
@@ -208,10 +220,7 @@ export function inpaint(width: i32, height: i32): void {
 	}
 	// return image;
 
-	for (let i = 0; i < len; i += 4) {
-		store<u8>(i + 0, image[i + 0]);
-		store<u8>(i + 1, image[i + 1]);
-		store<u8>(i + 2, image[i + 2]);
-		store<u8>(i + 3, image[i + 3]);
+	for (let i = 0; i < len; i++) {
+		channel[i] = image[i];
 	}
 }
