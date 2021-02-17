@@ -37,7 +37,7 @@
  (global $src/index/Int32Array_ID i32 (i32.const 3))
  (global $src/index/LARGE_VALUE f64 (f64.const 1e6))
  (global $src/index/SMALL_VALUE f64 (f64.const 1e-06))
- (global $src/index/radius i32 (i32.const 5))
+ (global $src/index/RADIUS i32 (i32.const 5))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tcms/fromSpace (mut i32) (i32.const 0))
@@ -4478,9 +4478,9 @@
   (local $15 i32)
   (local $16 i32)
   (local $17 i32)
-  (local $18 f64)
+  (local $18 i32)
   (local $19 f64)
-  (local $20 f64)
+  (local $20 i32)
   (local $21 f64)
   (local $22 f64)
   (local $23 f64)
@@ -4587,7 +4587,6 @@
      local.get $11
      local.get $17
      i32.sub
-     f64.convert_i32_s
      local.set $18
      local.get $13
      f64.convert_i32_s
@@ -4596,17 +4595,20 @@
      local.set $19
      local.get $18
      local.get $18
-     f64.mul
+     i32.mul
      local.set $20
      local.get $19
      local.get $19
      f64.mul
      local.set $21
-     f64.const 1
+     i32.const 1
+     f64.convert_i32_s
      local.get $20
+     f64.convert_i32_s
      local.get $21
      f64.add
      local.get $20
+     f64.convert_i32_s
      local.get $21
      f64.add
      local.set $22
@@ -4615,8 +4617,10 @@
      f64.mul
      f64.div
      local.set $22
-     f64.const 1
-     f64.const 1
+     i32.const 1
+     f64.convert_i32_s
+     i32.const 1
+     f64.convert_i32_s
      local.get $2
      local.get $16
      call $~lib/typedarray/Float64Array#__uget
@@ -4631,6 +4635,7 @@
      f64.div
      local.set $23
      local.get $18
+     f64.convert_i32_s
      local.get $9
      f64.mul
      local.get $19
@@ -4820,12 +4825,12 @@
   call $~lib/array/Array<i32>#constructor
   local.set $8
   i32.const 0
-  global.get $src/index/radius
+  global.get $src/index/RADIUS
   i32.sub
   local.set $9
   loop $for-loop|2
    local.get $9
-   global.get $src/index/radius
+   global.get $src/index/RADIUS
    i32.le_s
    local.set $10
    local.get $10

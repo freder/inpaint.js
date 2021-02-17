@@ -3017,8 +3017,8 @@
   (local $9 i32)
   (local $10 i32)
   (local $11 i32)
-  (local $12 f64)
-  (local $13 i32)
+  (local $12 i32)
+  (local $13 f64)
   (local $14 i32)
   (local $15 i32)
   (local $16 i32)
@@ -3026,7 +3026,6 @@
   (local $18 f64)
   (local $19 f64)
   (local $20 i32)
-  (local $21 f64)
   i32.const 12
   i32.const 3
   call $~lib/rt/tcms/__new
@@ -3312,9 +3311,9 @@
     select
     br_if $while-continue|4
     i32.const 0
-    local.set $13
+    local.set $14
     loop $for-loop|5
-     local.get $13
+     local.get $14
      i32.const 4
      i32.lt_s
      if
@@ -3323,7 +3322,7 @@
       local.get $15
       local.get $6
       i32.load offset=4
-      local.get $13
+      local.get $14
       i32.const 2
       i32.shl
       i32.add
@@ -3348,7 +3347,7 @@
        local.get $3
        i32.const 1
        i32.sub
-       local.tee $14
+       local.tee $12
        local.get $7
        local.get $10
        call $src/index/eikonal
@@ -3361,7 +3360,7 @@
        local.get $3
        i32.add
        local.tee $16
-       local.get $14
+       local.get $12
        local.get $7
        local.get $10
        call $src/index/eikonal
@@ -3516,7 +3515,7 @@
            i32.div_s
            f64.convert_i32_s
            f64.floor
-           local.tee $12
+           local.tee $13
            local.get $1
            i32.const 1
            i32.sub
@@ -3526,16 +3525,16 @@
            local.get $9
            local.get $0
            i32.rem_s
-           local.tee $14
+           local.tee $12
            local.get $0
            i32.const 1
            i32.sub
            i32.ge_s
            i32.const 1
-           local.get $12
+           local.get $13
            f64.const 1
            f64.le
-           local.get $14
+           local.get $12
            i32.const 1
            i32.le_s
            select
@@ -3553,22 +3552,22 @@
            local.get $5
            f64.const 1
            local.get $16
-           local.get $14
+           local.get $12
            i32.sub
+           local.tee $12
+           local.get $12
+           i32.mul
            f64.convert_i32_s
+           local.get $20
+           f64.convert_i32_s
+           local.get $13
+           f64.sub
            local.tee $5
            local.get $5
            f64.mul
-           local.get $20
-           f64.convert_i32_s
-           local.get $12
-           f64.sub
-           local.tee $12
-           local.get $12
-           f64.mul
            f64.add
-           local.tee $21
-           local.get $21
+           local.tee $13
+           local.get $13
            f64.sqrt
            f64.mul
            f64.div
@@ -3593,10 +3592,11 @@
            f64.add
            f64.div
            f64.mul
-           local.get $5
+           local.get $12
+           f64.convert_i32_s
            local.get $18
            f64.mul
-           local.get $12
+           local.get $5
            local.get $19
            f64.mul
            f64.add
@@ -3604,7 +3604,7 @@
            f64.mul
            f64.const 1e-06
            f64.add
-           local.tee $12
+           local.tee $13
            local.get $2
            i32.load offset=4
            local.get $9
@@ -3617,7 +3617,7 @@
            f64.add
            local.set $5
            local.get $17
-           local.get $12
+           local.get $13
            f64.add
            local.set $17
           end
@@ -3637,10 +3637,10 @@
         call $~lib/typedarray/Int32Array#__set
        end
       end
-      local.get $13
+      local.get $14
       i32.const 1
       i32.add
-      local.set $13
+      local.set $14
       br $for-loop|5
      end
     end

@@ -4,9 +4,9 @@ import HeapQueue from './HeapQueue';
 export const Int32Array_ID = idof<Int32Array>();
 
 
-const LARGE_VALUE = f64(1e6);
-const SMALL_VALUE = f64(1e-6);
-const radius = i32(5);
+const LARGE_VALUE: f64 = 1e6;
+const SMALL_VALUE: f64 = 1e-6;
+const RADIUS: i32 = 5;
 
 
 function min<T>(vals: Array<T>): T {
@@ -28,8 +28,8 @@ function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float64Array): f64 {
 	const f2 = unchecked(flag[n2]);
 	if (f1 == 0) {
 		if (f2 == 0) {
-			const perp = f64(Math.sqrt(2 - (u1 - u2) * (u1 - u2)));
-			let s = f64((u1 + u2 - perp) * 0.5);
+			const perp = Math.sqrt(2 - (u1 - u2) * (u1 - u2));
+			let s = (u1 + u2 - perp) * 0.5;
 			if (s >= u1 && s >= u2) {
 				u_out = s;
 			} else {
@@ -48,16 +48,16 @@ function eikonal(n1: i32, n2: i32, flag: Int32Array, u: Float64Array): f64 {
 }
 
 
-function grad_func(array: Float64Array, n: i32, step: i32, flag: Int32Array): f64 {
+function grad_func(u: Float64Array, n: i32, step: i32, flag: Int32Array): f64 {
 	if (unchecked(flag[n + step]) != 2) { // UNKNOWN
 		if (unchecked(flag[n - step]) != 2) {
-			return (unchecked(array[n + step] - array[n - step])) * 0.5;
+			return (unchecked(u[n + step] - u[n - step])) * 0.5;
 		} else {
-			return unchecked(array[n + step] - array[n]);
+			return unchecked(u[n + step] - u[n]);
 		}
 	} else {
 		if (unchecked(flag[n - step]) != 2) {
-			return unchecked(array[n] - array[n - step]);
+			return unchecked(u[n] - u[n - step]);
 		} else {
 			return 0;
 		}
@@ -101,17 +101,17 @@ function inpaint_point(
 			continue;
 		}
 
-		const rx = f64(i - i_nb);
-		const ry = f64(j - j_nb);
+		const rx = i - i_nb;
+		const ry = j - j_nb;
 		const rx2 = rx * rx;
 		const ry2 = ry * ry;
 
-		const geometric_dst = f64(1 / ((rx2 + ry2) * Math.sqrt(rx2 + ry2)));
-		const levelset_dst = f64(1 / (1 + Math.abs(unchecked(u[nb]) - unchecked(u[n]))));
-		const direction = f64(Math.abs(rx * gradx_u + ry * grady_u));
-		const weight: f64 = geometric_dst * levelset_dst * direction + SMALL_VALUE;
+		const geometric_dst = 1 / ((rx2 + ry2) * Math.sqrt(rx2 + ry2));
+		const levelset_dst = 1 / (1 + Math.abs(unchecked(u[nb]) - unchecked(u[n])));
+		const direction = Math.abs(rx * gradx_u + ry * grady_u);
+		const weight = geometric_dst * levelset_dst * direction + SMALL_VALUE;
 
-		Ia += weight * f64(unchecked(image[nb]));
+		Ia += weight * unchecked(image[nb]);
 		norm += weight;
 	}
 	// the fmm.py which this is based on actually implements a slightly different
@@ -161,8 +161,8 @@ function inpaintChannel(
 
 	const indices_centered = new Array<i32>();
 	// generate a mask for a circular structuring element
-	const radius2 = radius * radius;
-	for (let i = -radius; i <= radius; i++) {
+	const radius2 = RADIUS * RADIUS;
+	for (let i = -RADIUS; i <= RADIUS; i++) {
 		const h = i32(Math.floor(
 			Math.sqrt(radius2 - i * i)
 		));
