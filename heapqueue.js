@@ -54,7 +54,7 @@
 
 */
 
-/*export default*/ function HeapQueue(cmp) {
+export default function HeapQueue(cmp) {
 	this.cmp =
 		cmp ||
 		function (a, b) {
