@@ -150,9 +150,10 @@ export default function InpaintTelea(width, height, image, mask, radius) {
 	}
 
 	const indices_centered = [];
+	const radius2 = radius * radius;
 	// generate a mask for a circular structuring element
 	for (let i = -radius; i <= radius; i++) {
-		const h = Math.floor(Math.sqrt(radius * radius - i * i));
+		const h = Math.floor(Math.sqrt(radius2 - i * i));
 		for (let j = -h; j <= h; j++) {
 			indices_centered.push(i + j * width);
 		}
@@ -166,8 +167,9 @@ export default function InpaintTelea(width, height, image, mask, radius) {
 		if (i <= 1 || j <= 1 || i >= width - 1 || j >= height - 1) {
 			continue;
 		}
+		const a = [-width, -1, width, 1];
 		for (let k = 0; k < 4; k++) {
-			const nb = n + [-width, -1, width, 1][k];
+			const nb = n + a[k];
 			if (flag[nb] != 0) {
 				// not KNOWN
 				u[nb] = Math.min(
